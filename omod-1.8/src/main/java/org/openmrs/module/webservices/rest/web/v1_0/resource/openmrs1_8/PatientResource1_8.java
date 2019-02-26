@@ -49,7 +49,7 @@ import java.util.Set;
 /**
  * {@link Resource} for Patients, supporting standard CRUD operations
  */
-@Resource(name = RestConstants.VERSION_1 + "/patient", supportedClass = Patient.class, supportedOpenmrsVersions = { "1.8.*", "1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*", "2.1.*", "2.2.*" })
+@Resource(name = RestConstants.VERSION_1 + "/patient", supportedClass = Patient.class, supportedOpenmrsVersions = { "1.8.*" })
 public class PatientResource1_8 extends DataDelegatingCrudResource<Patient> {
 	
 	public PatientResource1_8() {
@@ -297,13 +297,17 @@ public class PatientResource1_8 extends DataDelegatingCrudResource<Patient> {
 	 */
 	@Override
 	protected AlreadyPaged<Patient> doSearch(RequestContext context) {
-		AlreadyPaged<Patient> alreadyPagedResults = new ServiceSearcher<Patient>(PatientService.class, "getPatients", "getCountOfPatients").search(
-		    context.getParameter("givenname"), context);
-		if (alreadyPagedResults.getTotalCount() > 0) {
+		if (context == null) {
+			throw new RuntimeException("Context is null");
+		}
+		AlreadyPaged<Patient> alreadyPagedResults = new ServiceSearcher<Patient>(PatientService.class, "getPatients",
+		        "getCountOfPatients").search(context.getParameter("givenname"), context);
+		if (!alreadyPagedResults.getPageOfResults().isEmpty()) {
 			return alreadyPagedResults;
+			
 		}
 		return new ServiceSearcher<Patient>(PatientService.class, "getPatients", "getCountOfPatients").search(
-			    context.getParameter("familyname"), context);
+		    context.getParameter("familyname"), context);
 	}
 	
 	/**
