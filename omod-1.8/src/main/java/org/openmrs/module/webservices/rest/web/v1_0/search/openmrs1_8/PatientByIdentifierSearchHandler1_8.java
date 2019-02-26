@@ -46,7 +46,6 @@ public class PatientByIdentifierSearchHandler1_8 implements SearchHandler {
 	
 	@Override
 	public PageableResult search(RequestContext context) throws ResponseException {
-		
 		String identifier = context.getRequest().getParameter("identifier");
 		String searchType = context.getParameter("searchType");
 		
@@ -64,7 +63,6 @@ public class PatientByIdentifierSearchHandler1_8 implements SearchHandler {
 				}
 			}
 		}
-		
 		return new EmptySearchResult();
 	}
 	
