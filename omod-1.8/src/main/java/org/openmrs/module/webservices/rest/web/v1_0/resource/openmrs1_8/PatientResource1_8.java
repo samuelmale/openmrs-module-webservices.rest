@@ -15,9 +15,12 @@ import io.swagger.models.properties.ArrayProperty;
 import io.swagger.models.properties.BooleanProperty;
 import io.swagger.models.properties.RefProperty;
 import io.swagger.models.properties.StringProperty;
+
+import org.openmrs.Encounter;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.Person;
+import org.openmrs.PersonAttribute;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.webservices.rest.SimpleObject;
@@ -41,6 +44,8 @@ import org.openmrs.module.webservices.rest.web.response.ResponseException;
 import org.openmrs.module.webservices.validation.ValidateUtil;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +76,111 @@ public class PatientResource1_8 extends DataDelegatingCrudResource<Patient> {
 	 */
 	@PropertySetter("person")
 	public static void setPerson(Patient instance, String personUuid) {
+	}
+	
+	// More properties
+	
+	@PropertyGetter("givenname")
+	public static String getGivenName(Patient patient) {
+		return patient.getGivenName();
+	}
+	
+	@PropertyGetter("middlename")
+	public static String getMiddleName(Patient patient) {
+		return patient.getMiddleName();
+	}
+	
+	@PropertyGetter("village")
+	public static String getVillage(Patient patient) {
+		return patient.getPersonAddress().getCityVillage();
+	}
+	
+	@PropertyGetter("familyname")
+	public static String getFamilyName(Patient patient) {
+		return patient.getFamilyName();
+	}
+	
+	@PropertyGetter("firstenc")
+	public static String getFirstEncounterDate(Patient patient) {
+		List<Encounter> encounters = Context.getEncounterService().getEncountersByPatient(patient);
+		if (!encounters.isEmpty()) {
+			Collections.sort(encounters, new Comparator<Encounter>() {
+				
+				@Override
+				public int compare(Encounter o1, Encounter o2) {
+					return o1.getDateCreated().compareTo(o2.getDateCreated());
+				}
+				
+			});
+			return encounters.get(0).getDateCreated().toString();
+		}
+		return null;
+	}
+	
+	@PropertyGetter("parish")
+	public static String getParish(Patient patient) {
+		for (PersonAttribute att : patient.getActiveAttributes()) {
+			String attributeName = att.getAttributeType().getName();
+			if (attributeName.equalsIgnoreCase("Parish")) {
+				return att.getValue();
+			}
+		}
+		return null;
+	}
+	
+	@PropertyGetter("tel")
+	public static String getTelephoneNumber(Patient patient) {
+		for (PersonAttribute att : patient.getActiveAttributes()) {
+			String attributeName = att.getAttributeType().getName();
+			if (attributeName.equalsIgnoreCase("Telephone Number")) {
+				return att.getValue();
+			}
+		}
+		return null;
+	}
+	
+	@PropertyGetter("support-tel-num")
+	public static String getTreatmentSupportTelNum(Patient patient) {
+		for (PersonAttribute att : patient.getActiveAttributes()) {
+			String attributeName = att.getAttributeType().getName();
+			if (attributeName.equalsIgnoreCase("Treatment Supporter Telephone Number")) {
+				return att.getValue();
+			}
+		}
+		return null;
+	}
+	
+	@PropertyGetter("county")
+	public static String getCounty(Patient patient) {
+		for (PersonAttribute att : patient.getActiveAttributes()) {
+			String attributeName = att.getAttributeType().getName();
+			if (attributeName.equalsIgnoreCase("County")) {
+				return att.getValue();
+			}
+		}
+		return null;
+	}
+	
+	@PropertyGetter("subcounty")
+	public static String getSubCounty(Patient patient) {
+		for (PersonAttribute att : patient.getActiveAttributes()) {
+			String attributeName = att.getAttributeType().getName();
+			if (attributeName.equalsIgnoreCase("Sub-county")) {
+				return att.getValue();
+			}
+		}
+		return null;
+	}
+	
+	@PropertyGetter("district")
+	public static String getDistrict(Patient patient) {
+		for (PersonAttribute att : patient.getActiveAttributes()) {
+			String attributeName = att.getAttributeType().getName();
+			if (attributeName.equalsIgnoreCase("District")) {
+				return att.getValue();
+			}
+		}
+		return null;
 	}
 	
 	@PropertyGetter("identifiers")
@@ -118,10 +228,22 @@ public class PatientResource1_8 extends DataDelegatingCrudResource<Patient> {
 	 */
 	@Override
 	public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
+		
 		if (rep instanceof DefaultRepresentation) {
 			DelegatingResourceDescription description = new DelegatingResourceDescription();
 			description.addProperty("uuid");
+			description.addProperty("givenname");
+			description.addProperty("middlename");
+			description.addProperty("village");
+			description.addProperty("familyname");
+			description.addProperty("firstenc");
 			description.addProperty("display");
+			description.addProperty("parish");
+			description.addProperty("tel");
+			description.addProperty("support-tel-num");
+			description.addProperty("county");
+			description.addProperty("subcounty");
+			description.addProperty("district");
 			description.addProperty("identifiers", Representation.REF);
 			description.addProperty("person", Representation.DEFAULT);
 			description.addProperty("voided");
@@ -132,6 +254,17 @@ public class PatientResource1_8 extends DataDelegatingCrudResource<Patient> {
 			DelegatingResourceDescription description = new DelegatingResourceDescription();
 			description.addProperty("uuid");
 			description.addProperty("display");
+			description.addProperty("givenname");
+			description.addProperty("middlename");
+			description.addProperty("village");
+			description.addProperty("familyname");
+			description.addProperty("firstenc");
+			description.addProperty("parish");
+			description.addProperty("tel");
+			description.addProperty("support-tel-num");
+			description.addProperty("county");
+			description.addProperty("subcounty");
+			description.addProperty("district");
 			description.addProperty("identifiers", Representation.DEFAULT);
 			description.addProperty("person", Representation.FULL);
 			description.addProperty("voided");
