@@ -92,7 +92,10 @@ public class PatientResource1_8 extends DataDelegatingCrudResource<Patient> {
 	
 	@PropertyGetter("village")
 	public static String getVillage(Patient patient) {
-		return patient.getPersonAddress().getCityVillage();
+		if (patient.getPersonAddress() != null) {
+			patient.getPersonAddress().getCityVillage();
+		}
+		return null;
 	}
 	
 	@PropertyGetter("familyname")
